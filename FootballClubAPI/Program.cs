@@ -1,15 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+using FootballClubAPI.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+
+builder.Services.AddDbContext<FutbolClubContext>(options =>
+    options.UseSqlServer("Server=LAPTOP-HEDUSGRR\\SQLEXPRESS;Database=FutbolClubDB;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True;"));
+
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -17,9 +25,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
+
