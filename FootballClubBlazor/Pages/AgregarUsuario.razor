@@ -1,0 +1,45 @@
+﻿@page "/agregar-usuario"
+@inject FootballClubBlazor.Services.UsuarioService UsuarioService
+@using FootballClubBlazor.Models
+
+<h3>Agregar Usuario</h3>
+
+<div class="card p-3">
+    <input placeholder="Nombre" @bind="usuario.Nombre" class="form-control mb-2" />
+    <input placeholder="Apellido" @bind="usuario.Apellido" class="form-control mb-2" />
+    <input placeholder="Email" @bind="usuario.Email" class="form-control mb-2" />
+    <button class="btn btn-success" @onclick="GuardarUsuario">Guardar</button>
+</div>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-info mt-2">@mensaje</div>
+}
+
+@code {
+    private Usuario usuario = new Usuario();
+    private string mensaje;
+
+    async Task GuardarUsuario()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(usuario.Nombre) ||
+                string.IsNullOrWhiteSpace(usuario.Apellido) ||
+                string.IsNullOrWhiteSpace(usuario.Email))
+            {
+                mensaje = "Todos los campos son obligatorios.";
+                return;
+            }
+
+            await UsuarioService.AddUsuarioAsync(usuario);
+            mensaje = "Usuario agregado correctamente!";
+            usuario = new Usuario(); // limpiar formulario
+        }
+        catch (Exception ex)
+        {
+            mensaje = "Error al agregar usuario: " + ex.Message;
+        }
+    }
+}
+

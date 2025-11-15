@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using FootballClubAPI.Data;
+﻿using FootballClubAPI.Data;
 using FootballClubAPI.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FootballClubAPI.Controllers
 {
@@ -9,56 +10,47 @@ namespace FootballClubAPI.Controllers
     [ApiController]
     public class UsuariosController : ControllerBase
     {
-        private readonly FutbolClubContext _context;
+        private readonly IUsuarioRepository _repository;
 
-        public UsuariosController(FutbolClubContext context)
+        public UsuariosController(IUsuarioRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
-        
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
+        public async Task<IEnumerable<Usuario>> GetUsuarios()
         {
-            return await _context.Usuarios.ToListAsync();
+            return await _repository.GetAllAsync();
         }
 
-        
         [HttpGet("{id}")]
         public async Task<ActionResult<Usuario>> GetUsuario(int id)
         {
-            var usuario = await _context.Usuarios.FindAsync(id);
+            var usuario = await _repository.GetByIdAsync(id);
             if (usuario == null) return NotFound();
             return usuario;
         }
 
-        
         [HttpPost]
-        public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
+        public async Task<ActionResult<Usuario>> CreateUsuario(Usuario usuario)
         {
-            _context.Usuarios.Add(usuario);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetUsuario), new { id = usuario.Id }, usuario);
+            var newUser = await _repository.AddAsync(usuario);
+            return CreatedAtAction(nameof(GetUsuario), new { id = newUser.Id }, newUser);
         }
 
-        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUsuario(int id, Usuario usuario)
+        public async Task<IActionResult> UpdateUsuario(int id, Usuario usuario)
         {
             if (id != usuario.Id) return BadRequest();
-            _context.Entry(usuario).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            await _repository.UpdateAsync(usuario);
             return NoContent();
         }
 
-        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUsuario(int id)
         {
-            var usuario = await _context.Usuarios.FindAsync(id);
-            if (usuario == null) return NotFound();
-            _context.Usuarios.Remove(usuario);
-            await _context.SaveChangesAsync();
+            var result = await _repository.DeleteAsync(id);
+            if (!result) return NotFound();
             return NoContent();
         }
     }

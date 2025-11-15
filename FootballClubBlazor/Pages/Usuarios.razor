@@ -1,0 +1,147 @@
+﻿@page "/usuarios"
+@inject FootballClubBlazor.Services.UsuarioService UsuarioService
+@using FootballClubBlazor.Models
+
+<h3>Usuarios</h3>
+
+<button class="btn btn-primary mb-2" @onclick="NuevoUsuario">Agregar Usuario</button>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-info mt-2">@mensaje</div>
+}
+
+@if (usuarios == null)
+{
+    <p>Cargando...</p>
+}
+else if (usuarios.Count == 0)
+{
+    <p>No hay usuarios registrados.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in usuarios)
+            {
+                <tr>
+                    <td>@u.Nombre</td>
+                    <td>@u.Apellido</td>
+                    <td>@u.Email</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary me-2" @onclick="() => EditarUsuario(u)">Editar</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => EliminarUsuario(u.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (mostrarFormulario)
+{
+    <div class="card p-3 mt-3">
+        <input placeholder="Nombre" @bind="usuarioForm.Nombre" class="form-control mb-2" />
+        <input placeholder="Apellido" @bind="usuarioForm.Apellido" class="form-control mb-2" />
+        <input placeholder="Email" @bind="usuarioForm.Email" class="form-control mb-2" />
+        <button class="btn btn-success me-2" @onclick="GuardarUsuario">Guardar</button>
+        <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </div>
+}
+
+@code {
+    private List<Usuario> usuarios;
+    private Usuario usuarioForm = new Usuario();
+    private bool mostrarFormulario = false;
+    private bool esEdicion = false;
+    private string mensaje;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarUsuarios();
+    }
+
+    private async Task CargarUsuarios()
+    {
+        try
+        {
+            usuarios = await UsuarioService.GetUsuariosAsync();
+        }
+        catch (Exception ex)
+        {
+            mensaje = "Error al cargar usuarios: " + ex.Message;
+            usuarios = new List<Usuario>();
+        }
+    }
+
+    void NuevoUsuario()
+    {
+        usuarioForm = new Usuario();
+        mostrarFormulario = true;
+        esEdicion = false;
+    }
+
+    void EditarUsuario(Usuario u)
+    {
+        usuarioForm = new Usuario
+        {
+            Id = u.Id,
+            Nombre = u.Nombre,
+            Apellido = u.Apellido,
+            Email = u.Email
+        };
+        mostrarFormulario = true;
+        esEdicion = true;
+    }
+
+    async Task GuardarUsuario()
+    {
+        try
+        {
+            if (esEdicion)
+                await UsuarioService.UpdateUsuarioAsync(usuarioForm);
+            else
+                await UsuarioService.AddUsuarioAsync(usuarioForm);
+
+            mensaje = esEdicion ? "Usuario actualizado correctamente!" : "Usuario agregado correctamente!";
+            mostrarFormulario = false;
+            await CargarUsuarios();
+        }
+        catch (Exception ex)
+        {
+            mensaje = "Error al guardar usuario: " + ex.Message;
+        }
+    }
+
+    async Task EliminarUsuario(int id)
+    {
+        try
+        {
+            await UsuarioService.DeleteUsuarioAsync(id);
+            mensaje = "Usuario eliminado correctamente!";
+            await CargarUsuarios();
+        }
+        catch (Exception ex)
+        {
+            mensaje = "Error al eliminar usuario: " + ex.Message;
+        }
+    }
+
+    void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+}
+
+
+
+

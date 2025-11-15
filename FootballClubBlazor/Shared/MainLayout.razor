@@ -1,0 +1,33 @@
+﻿@inherits LayoutComponentBase
+
+<div class="sidebar">
+    <NavMenu />  
+</div>
+
+<div class="main">
+    @Body  
+</div>
+
+<style>
+    .sidebar {
+        width: 200px;
+        float: left;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        height: 100vh;
+    }
+
+    .main {
+        margin-left: 220px;
+        padding: 1rem;
+    }
+
+    .nav-link.active {
+        font-weight: bold;
+        color: #0d6efd;
+    }
+</style>
+
+
+
+
