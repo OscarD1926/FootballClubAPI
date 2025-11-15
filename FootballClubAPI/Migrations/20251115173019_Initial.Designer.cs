@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FootballClubAPI.Migrations
 {
     [DbContext(typeof(FutbolClubContext))]
-    [Migration("20251115030938_AdoptarTablaUsuarios")]
-    partial class AdoptarTablaUsuarios
+    [Migration("20251115173019_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

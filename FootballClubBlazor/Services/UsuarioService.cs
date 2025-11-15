@@ -6,7 +6,7 @@ namespace FootballClubBlazor.Services
     public class UsuarioService
     {
         private readonly HttpClient _http;
-        private readonly string apiUrl = "https://localhost:7188/api/usuarios"; // HTTPS API
+        private readonly string apiUrl = "https://localhost:7188/api/usuarios"; 
 
         public UsuarioService(HttpClient http)
         {

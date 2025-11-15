@@ -6,10 +6,12 @@ using FootballClubAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddControllers();
+
+
 builder.Services.AddDbContext<FutbolClubContext>(options =>
-    options.UseSqlServer("Server=LAPTOP-HEDUSGRR\\SQLEXPRESS;Database=FutbolClubDB;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True;"));
+    options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=FutbolClubDB;Trusted_Connection=True;MultipleActiveResultSets=true;"));
+
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -35,5 +37,12 @@ app.UseHttpsRedirection();
 app.UseCors("AllowBlazorDev");
 app.UseAuthorization();
 app.MapControllers();
+
+// Aplica migraciones automáticamente
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<FutbolClubContext>();
+    db.Database.Migrate();
+}
 
 app.Run();
